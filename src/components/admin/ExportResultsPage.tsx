@@ -156,6 +156,49 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
         anyData = true;
       }
 
+      // Add Top 3 by Domain sheet
+      const top3ByDomainRows: any[] = [];
+      for (const domainKey of allDomains) {
+        const domainName = domainNames[domainKey] || domainKey;
+        const domainTeamsData = Array.from(teamTotals.values())
+          .filter(t => t.domain === domainName || t.domain === domainKey)
+          .sort((a, b) => (b.totalSum / b.count) - (a.totalSum / a.count))
+          .slice(0, 3); // Get top 3
+
+        if (domainTeamsData.length > 0) {
+          top3ByDomainRows.push({
+            'Domain': domainName,
+            'Rank': '',
+            'Team ID': '',
+            'Team Name': '',
+            'Judge Count': '',
+            'Total Score Sum': '',
+            'Average Score': ''
+          });
+
+          domainTeamsData.forEach((team, index) => {
+            top3ByDomainRows.push({
+              'Domain': '',
+              'Rank': index + 1,
+              'Team ID': team.teamId,
+              'Team Name': team.teamName,
+              'Judge Count': team.count,
+              'Total Score Sum': team.totalSum.toFixed(2),
+              'Average Score': (team.totalSum / team.count).toFixed(2)
+            });
+          });
+
+          top3ByDomainRows.push({}); // Empty row between domains
+        }
+      }
+
+      if (top3ByDomainRows.length > 0) {
+        const wsTop3 = XLSX.utils.json_to_sheet(top3ByDomainRows);
+        applyWrapAndWidths(wsTop3, [38, 8, 14, 24, 14, 14, 14]);
+        XLSX.utils.book_append_sheet(workbook, wsTop3, 'Top 3 by Domain');
+        anyData = true;
+      }
+
       if (!anyData) {
         toast.dismiss(toastId);
         alert('No data available to export for any domain.');
@@ -227,6 +270,7 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
               <li>• Team problem statements</li>
               <li>• Individual criterion scores</li>
               <li>• Aggregated results with rankings</li>
+              <li>• Top 3 teams by domain</li>
             </ul>
           </div>
 
