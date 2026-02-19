@@ -5,14 +5,6 @@ import { CheckCircle, Users, TrendingUp } from 'lucide-react';
 export function QuickActionsPage() {
   const actions = [
     {
-      to: '/admin/team-allocation',
-      icon: CheckCircle,
-      title: 'Team Allocation',
-      description: 'Assign judges to teams by round',
-      bgColor: 'bg-green-100',
-      iconColor: 'text-green-600',
-    },
-    {
       to: '/admin/allocation-view',
       icon: Users,
       title: 'View Allocations',

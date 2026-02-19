@@ -90,13 +90,11 @@ export const exportScoresToExcel = (
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Scoring Results');
 
-  // Add summary sheet
+  // Add summary sheet (without Average Score and Judges Evaluated)
   const summaryData = sortedTeams.map((team, index) => ({
     Rank: index + 1,
     'Team Name': team.teamName,
     Domain: team.domain,
-    'Average Score': team.averageScore.toFixed(2),
-    'Judges Evaluated': `${team.scoresReceived}/${team.totalJudges}`,
     'Qualification Status': team.qualificationStatus,
     'Team Members': team.members.map(m => m.name).join(', ')
   }));
@@ -106,8 +104,6 @@ export const exportScoresToExcel = (
     { wch: 6 },  // Rank
     { wch: 25 }, // Team Name
     { wch: 20 }, // Domain
-    { wch: 15 }, // Average Score
-    { wch: 18 }, // Judges Evaluated
     { wch: 20 }, // Qualification Status
     { wch: 50 }  // Team Members
   ];

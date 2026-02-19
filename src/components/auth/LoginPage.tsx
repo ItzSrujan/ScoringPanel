@@ -35,8 +35,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       };
     }
 
+    // For admin, use payload.id (not judgeId)
     return {
-      id: payload.judgeId,
+      id: payload.id,
       name: payload.name,
       email: '',
       role: 'admin'

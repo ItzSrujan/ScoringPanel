@@ -1,6 +1,7 @@
 // admin/DashboardOverview.tsx
+import { useState } from 'react';
 import { Event, Team, Score, Judge } from '../../types';
-import { Users, Scale, FileText, Award } from 'lucide-react';
+import { Users, Scale, FileText, Award, Loader2 } from 'lucide-react';
 
 interface DashboardOverviewProps {
   events: Event[];
@@ -16,6 +17,9 @@ export function DashboardOverview({ events, teams, scores, judges }: DashboardOv
   const round1Scores = scores.filter(s => s.round === 'Round 1').length;
   const round2Scores = scores.filter(s => s.round === 'Round 2').length;
 
+  const [loading, setLoading] = useState(false);
+  const [round1Calculated, setRound1Calculated] = useState(false);
+
   const stats = [
     {
       label: 'Registered Teams',
@@ -25,7 +29,7 @@ export function DashboardOverview({ events, teams, scores, judges }: DashboardOv
       iconColor: 'text-blue-600',
     },
     {
-      label: 'Active Judges',
+      label: 'Judges Count',
       value: activeJudges,
       icon: Scale,
       bgColor: 'bg-green-50',
@@ -47,6 +51,7 @@ export function DashboardOverview({ events, teams, scores, judges }: DashboardOv
     },
   ];
 
+  // ...existing code...
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-slate-900">Admin Dashboard</h1>

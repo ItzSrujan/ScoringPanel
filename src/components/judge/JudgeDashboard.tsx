@@ -164,21 +164,7 @@ export function JudgeDashboard({ currentUser, events, teams, scores }: JudgeDash
         </div>
       )}
 
-      {/* Login Credentials Card */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900 mb-1">Your Login Credentials</h2>
-            <p className="text-sm text-slate-600">Use this ID to login to your judge panel</p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-slate-600 mb-1">Judge ID</p>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-300 rounded-lg shadow-sm">
-              <span className="text-xl font-bold text-blue-600 font-mono">{currentUser.id}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ...removed Your Login Credentials section... */}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -226,17 +212,7 @@ export function JudgeDashboard({ currentUser, events, teams, scores }: JudgeDash
         </div>
       </div>
 
-      {/* Expertise */}
-      {judgeProfile && judgeProfile.expertise.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-3">Your Expertise</h2>
-          <div className="flex items-center gap-2">
-            <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-base font-medium border border-blue-200">
-              {judgeProfile.expertise[0]}
-            </span>
-          </div>
-        </div>
-      )}
+      {/* ...removed Your Expertise section... */}
 
       {/* Event Selector */}
       {assignedEvents.length > 1 && (
@@ -298,7 +274,7 @@ export function JudgeDashboard({ currentUser, events, teams, scores }: JudgeDash
                 </span>
               </div>
               
-              {/* Search Bar */}
+              {/* Search Bar (no filters) */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
@@ -309,51 +285,6 @@ export function JudgeDashboard({ currentUser, events, teams, scores }: JudgeDash
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                </div>
-                
-                {/* Case Filter Buttons */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-slate-600 whitespace-nowrap">Filter:</span>
-                  <button
-                    onClick={() => setCaseFilter('all')}
-                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
-                      caseFilter === 'all'
-                        ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setCaseFilter('uppercase')}
-                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
-                      caseFilter === 'uppercase'
-                        ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    CAPS
-                  </button>
-                  <button
-                    onClick={() => setCaseFilter('lowercase')}
-                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
-                      caseFilter === 'lowercase'
-                        ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    small
-                  </button>
-                  <button
-                    onClick={() => setCaseFilter('mixed')}
-                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
-                      caseFilter === 'mixed'
-                        ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    Mixed
-                  </button>
                 </div>
               </div>
             </div>
@@ -410,11 +341,7 @@ export function JudgeDashboard({ currentUser, events, teams, scores }: JudgeDash
                             {team.domain}
                           </span>
 
-                          {/* Team Size */}
-                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-600">
-                            <Users className="size-3" />
-                            {team.members.length} member{team.members.length !== 1 ? 's' : ''}
-                          </span>
+
 
                           {/* Score if exists */}
                           {teamScore && teamScore.isFinalized && (

@@ -41,7 +41,8 @@ export function ResultCalculationPage({
     return new Set(scores.filter((s) => s.round === 'Round 1').map((s) => s.teamId));
   }, [scores]);
 
-  const canCalculateRound1 = round1ScoredTeamsSet.size === teams.length;
+  // Only enable Round 1 calculation if all teams have scores and not already calculated
+  const canCalculateRound1 = teams.length > 0 && round1ScoredTeamsSet.size === teams.length && !round1Calculated;
 
   useEffect(() => {
     setDisplayRound1ScoredTeams(round1ScoredTeamsSet.size);
@@ -55,13 +56,19 @@ export function ResultCalculationPage({
         if (res.calculated && res.count > 0) {
           setRound1HasResults(true);
           setRound1Calculated(true);
+        } else {
+          setRound1HasResults(false);
+          setRound1Calculated(false);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setRound1HasResults(false);
+        setRound1Calculated(false);
+      });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [teams.length, round1ScoredTeamsSet.size]);
 
   const refreshRound2Allocations = async () => {
     const rows: any[] = await listRoundTwoAllocations().catch(() => []);
@@ -84,9 +91,11 @@ export function ResultCalculationPage({
     setRound2ScoredTeams(uniqueTeams.size);
   }, [scores]);
 
-  const canSetupRound2 = round1HasResults && externalJudges.length > 0;
+  // Only enable Setup Round 2 if Round 1 is calculated and not already setup
+  const canSetupRound2 = round1Calculated && externalJudges.length > 0 && !hasRound2Setup;
+  // Only enable Round 2 calculation if all allocated teams have been scored and not already calculated
   const canCalculateRound2 =
-    round2AllocatedCount !== null && round2AllocatedCount > 0 && round2ScoredTeams === round2AllocatedCount;
+    round2AllocatedCount !== null && round2AllocatedCount > 0 && round2ScoredTeams === round2AllocatedCount && !round2Calculated;
 
   const getStatusBadge = (condition: boolean, label: string) => {
     if (condition) {
@@ -113,7 +122,7 @@ export function ResultCalculationPage({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Round 1 */}
           <button
-            disabled={!canCalculateRound1 || loadingRound1 || round1Calculated}
+            disabled={!canCalculateRound1 || loadingRound1}
             onClick={async () => {
               if (!canCalculateRound1) return;
               if (!confirm('Calculate Round 1 results now?')) return;
@@ -155,7 +164,7 @@ export function ResultCalculationPage({
 
           {/* Setup Round 2 */}
           <button
-            disabled={!canSetupRound2 || loadingSetupRound2 || hasRound2Setup}
+            disabled={!canSetupRound2 || loadingSetupRound2}
             onClick={async () => {
               if (!canSetupRound2) return;
               if (!confirm('Setup Round 2 with external judges?')) return;
@@ -200,7 +209,7 @@ export function ResultCalculationPage({
 
           {/* Round 2 */}
           <button
-            disabled={!canCalculateRound2 || loadingRound2 || round2Calculated}
+            disabled={!canCalculateRound2 || loadingRound2}
             onClick={async () => {
               if (!canCalculateRound2) return;
               if (!confirm('Calculate Round 2 results now?')) return;

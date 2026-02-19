@@ -38,31 +38,28 @@ export function ResultsView({ events, teams, scores }: ResultsViewProps) {
 
     const teamsWithScoresData: TeamWithScores[] = eventTeams.map(team => {
       const teamScores = eventScores.filter(s => s.teamId === team.id);
-      const averageScore = teamScores.length > 0
-        ? teamScores.reduce((sum, s) => sum + s.totalScore, 0) / teamScores.length
-        : 0;
-
       return {
         ...team,
-        averageScore,
-        totalJudges: selectedEvent.assignedJudges.length,
+        // averageScore and totalJudges removed as per request
         scoresReceived: teamScores.length,
         individualScores: teamScores
       };
     });
 
-    // Sort by average score and assign ranks
-    const sorted = teamsWithScoresData.sort((a, b) => b.averageScore - a.averageScore);
+    // Sort by total score (or another metric if needed) and assign ranks
+    // If you want to keep ranking, you can use totalScore or another field
+    const sorted = teamsWithScoresData;
     sorted.forEach((team, index) => {
       team.rank = index + 1;
     });
-
     return sorted;
   }, [selectedEventId, selectedEvent, teams, scores]);
 
   const handleExport = () => {
     if (selectedEvent && teamsWithScores.length > 0) {
-      exportScoresToExcel(selectedEvent, teamsWithScores);
+      // Remove averageScore and totalJudges from export
+      const exportRows = teamsWithScores.map(({ averageScore, totalJudges, ...rest }) => rest);
+      exportScoresToExcel(selectedEvent, exportRows);
     }
   };
 
@@ -70,7 +67,7 @@ export function ResultsView({ events, teams, scores }: ResultsViewProps) {
     'S.No': index + 1,
     Domain: item.domainKey,
     Rank: item.rank,
-    'Team ID': item.teamId,
+   
     'Team Name': item.teamName,
     'Total Score': Number(item.totalScore ?? 0),
     'Innovation Score': Number(item.innovationCreativityScore ?? 0),
@@ -92,7 +89,13 @@ export function ResultsView({ events, teams, scores }: ResultsViewProps) {
       return (a.rank || 0) - (b.rank || 0);
     });
 
-    const rows = sorted.map(mapRoundOneResultRow);
+    const rows = sorted.map((item: any, index: number) => {
+      const row = mapRoundOneResultRow(item, index);
+      // Remove judge count and average score if present
+      delete row['Average Score'];
+      delete row['Judges'];
+      return row;
+    });
     const suffix = domainKey ? domainKey : 'all_domains';
     exportJsonToExcel(rows, `${selectedEvent.name}_Round1_Results_${suffix}`);
   };
@@ -123,6 +126,7 @@ export function ResultsView({ events, teams, scores }: ResultsViewProps) {
     const rows = top3.map((r: any, idx: number) => {
       const teamInfo = teams.find(t => t.teamId === r.teamId || t.teamName === r.teamName);
       const members = teamInfo?.members?.map((m: any) => m.name).join(', ') || '';
+      // Remove judge count and average score from top 3 export
       return {
         Rank: r.rank || idx + 1,
         'Domain Name': r.domainKey,

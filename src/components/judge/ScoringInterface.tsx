@@ -62,7 +62,8 @@ export function ScoringInterface({
     ? teams.filter(t => t.eventId === eventId && (t.allocatedJudges?.round2?.length || 0) > 0)
     : teams.filter(t => t.eventId === eventId);
 
-  const judgeIdentifier = (currentUser as any).judgeId || currentUser.id
+  // Always use currentUser.id for judgeId, for consistency with dashboard and score logic
+  const judgeIdentifier = currentUser.id
 
   const eventTeams = judgeType === 'External'
     ? availableTeams.filter(t => t.allocatedJudges?.round2?.includes(judgeIdentifier))
@@ -76,14 +77,25 @@ export function ScoringInterface({
     Record<string, { min: number; max: number }>
   >({})
   const [bonusScore, setBonusScore] = useState(0)
+  // Track the actual submitted state based on the score record, not just local state
   const [submitted, setSubmitted] = useState(false)
+
+  // Find if a finalized score already exists for this team by this judge
+  const finalizedScore = scores.find(
+    s =>
+      s.eventId === eventId &&
+      s.teamId === selectedTeam?.id &&
+      s.judgeId === judgeIdentifier &&
+      (s.round ? s.round === currentRound : currentRound === 'Round 1') &&
+      s.isFinalized
+  )
 
   useEffect(() => {
     const existingScore = scores.find(
       s =>
         s.eventId === eventId &&
         s.teamId === selectedTeam?.id &&
-        s.judgeId === (currentUser as any).judgeId &&
+        s.judgeId === judgeIdentifier &&
         (s.round ? s.round === currentRound : currentRound === 'Round 1')
     )
 
@@ -96,7 +108,7 @@ export function ScoringInterface({
       setBonusScore(0)
       setSubmitted(false)
     }
-  }, [eventId, selectedTeam?.id, scores, (currentUser as any).judgeId, currentRound])
+  }, [eventId, selectedTeam?.id, scores, judgeIdentifier, currentRound])
 
   useEffect(() => {
     if (eventTeams.length && !selectedTeamId) {
@@ -168,9 +180,17 @@ export function ScoringInterface({
   }
 
   /* =========================================================
-     SUBMITTED VIEW
+     SUBMITTED VIEW (always show if finalizedScore exists)
   ========================================================= */
-  if (submitted) {
+  if (submitted || finalizedScore) {
+    // Use the finalized score if available, else fallback to local state
+    const displayScore = finalizedScore || {
+      scores: criterionScores,
+      bonusScore,
+      totalScore,
+      teamId: selectedTeam.id,
+      eventId: event.id,
+    }
     return (
       <div className="max-w-3xl mx-auto space-y-6 text-center">
         <CheckCircle className="mx-auto text-green-600" size={64} />
@@ -189,7 +209,7 @@ export function ScoringInterface({
               <div key={c.id} className="flex justify-between">
                 <span>{c.name}</span>
                 <span className="font-semibold">
-                  {criterionScores[c.id]?.toFixed(1)}
+                  {displayScore.scores[c.id]?.toFixed(1)}
                 </span>
               </div>
             ))}
@@ -197,12 +217,12 @@ export function ScoringInterface({
 
           <div className="border-t pt-4 flex justify-between">
             <span>Bonus</span>
-            <span className="font-semibold">{bonusScore.toFixed(1)}</span>
+            <span className="font-semibold">{(displayScore.bonusScore ?? 0).toFixed(1)}</span>
           </div>
 
           <div className="border-t pt-4 flex justify-between text-lg font-bold">
             <span>Total Score</span>
-            <span className="text-green-700">{totalScore}</span>
+            <span className="text-green-700">{displayScore.totalScore}</span>
           </div>
         </div>
 
