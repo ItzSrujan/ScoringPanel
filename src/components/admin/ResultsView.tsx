@@ -238,13 +238,6 @@ export function ResultsView({ events, teams, scores }: ResultsViewProps) {
             {round2Results && round2Results.length > 0 && (
               <>
                 <button
-                  onClick={handleExportAllRound2}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl text-white font-medium hover:from-teal-700 hover:to-emerald-700 transition-all"
-                >
-                  <Download className="size-5" />
-                  Export All Round 2
-                </button>
-                <button
                   onClick={handleExportRound2Results}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-700 to-emerald-700 rounded-xl text-white font-medium hover:from-green-800 hover:to-emerald-800 transition-all"
                 >

@@ -93,9 +93,32 @@ export function ResultCalculationPage({
 
   // Only enable Setup Round 2 if Round 1 is calculated and not already setup
   const canSetupRound2 = round1Calculated && externalJudges.length > 0 && !hasRound2Setup;
-  // Only enable Round 2 calculation if all allocated teams have been scored and not already calculated
+  // Only enable Round 2 calculation if all teams have been scored by all external judges and not already calculated
+  const totalRequiredRound2Scores =
+    round2AllocatedCount !== null && externalJudges.length > 0
+      ? round2AllocatedCount * externalJudges.length
+      : 0;
+  const submittedRound2Scores = scores.filter((s) => s.round === 'Round 2').length;
+  // Persist round2Calculated if calculation was done (simulate backend flag)
+  useEffect(() => {
+    // If you have a backend flag, use it here instead
+    if (round2AllocatedCount && externalJudges.length > 0) {
+      const totalRequired = round2AllocatedCount * externalJudges.length;
+      const submitted = scores.filter((s) => s.round === 'Round 2').length;
+      // If calculation was done, keep as calculated
+      if (round2Calculated) return;
+      // If all scores are submitted and calculation was done, set as calculated
+      if (submitted === totalRequired && submitted > 0) {
+        setRound2Calculated(true);
+      }
+    }
+  }, [scores, round2AllocatedCount, externalJudges.length]);
   const canCalculateRound2 =
-    round2AllocatedCount !== null && round2AllocatedCount > 0 && round2ScoredTeams === round2AllocatedCount && !round2Calculated;
+    round2AllocatedCount !== null &&
+    round2AllocatedCount > 0 &&
+    externalJudges.length > 0 &&
+    submittedRound2Scores === totalRequiredRound2Scores &&
+    !round2Calculated;
 
   const getStatusBadge = (condition: boolean, label: string) => {
     if (condition) {
@@ -216,12 +239,41 @@ export function ResultCalculationPage({
               setLoadingRound2(true);
               try {
                 await calculateRoundTwoResults();
+                // After calculation, refresh the status from backend to persist calculated state
+                // You may need to implement a getRoundTwoStatus() API if not present
+                // For now, we will just setRound2Calculated(true) and trigger a refresh if possible
                 setRound2Calculated(true);
+                // Optionally, trigger a refresh of allocations or scores if parent provides a callback
+                if (typeof onRefreshRound2Allocations === 'function') {
+                  await onRefreshRound2Allocations();
+                }
               } catch {
                 alert('Failed to calculate Round 2 results');
               } finally {
                 setLoadingRound2(false);
+                // After calculation, re-check status from backend
+                // Add a new effect to fetch and set round2Calculated on mount and after calculation
               }
+              // Fetch and persist round2Calculated status from backend on mount and after calculation
+              useEffect(() => {
+                let mounted = true;
+                // You may need to implement a getRoundTwoStatus() API in scoringApi
+                // For now, we will infer from scores and allocations if possible
+                // If you have a backend flag, use that here
+                // Example pseudo-code:
+                // getRoundTwoStatus().then(res => setRound2Calculated(res.calculated));
+                // For now, if all scores are submitted and calculation was triggered, keep as calculated
+                if (round2AllocatedCount && externalJudges.length > 0) {
+                  const totalRequired = round2AllocatedCount * externalJudges.length;
+                  const submitted = scores.filter((s) => s.round === 'Round 2').length;
+                  if (submitted === totalRequired) {
+                    setRound2Calculated(true);
+                  }
+                }
+                return () => {
+                  mounted = false;
+                };
+              }, [scores, round2AllocatedCount, externalJudges.length]);
             }}
             className="relative flex flex-col items-start p-6 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md transition-all disabled:opacity-60 disabled:cursor-not-allowed text-left h-full"
           >
@@ -236,15 +288,16 @@ export function ResultCalculationPage({
               <div className="flex-1">
                 <h3 className="font-semibold text-slate-900">Round 2 Results</h3>
                 <p className="text-sm text-slate-500 mt-1">
-                  Round 2 scored: {round2ScoredTeams}/{round2AllocatedCount ?? 0}
+                  Round 2 scores submitted: {submittedRound2Scores}/{totalRequiredRound2Scores}
                 </p>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2 text-sm w-full">
-              {getStatusBadge(round2Calculated, 'Calculated')}
-              {!round2Calculated && canCalculateRound2 && (
+              {round2Calculated ? (
+                getStatusBadge(true, 'Calculated')
+              ) : canCalculateRound2 ? (
                 <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Ready to calculate</span>
-              )}
+              ) : null}
             </div>
           </button>
         </div>

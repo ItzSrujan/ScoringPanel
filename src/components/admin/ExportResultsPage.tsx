@@ -328,34 +328,12 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
               <Download className="size-5" />
               Export as Excel
             </button>
-            <button
-              onClick={handleExportRound2CSV}
-              className="w-full px-4 py-3 bg-amber-500 hover:bg-amber-600 text-black rounded-lg font-semibold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-            >
-              <Download className="size-5" />
-              Download as CSV
-            </button>
+            {/* Download as CSV button removed as requested */}
           </div>
         </div>
       </div>
 
-      {/* Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-semibold text-blue-900 mb-1">Export Information</h3>
-            <p className="text-sm text-blue-800">
-              Exported files will be downloaded to your default downloads folder.
-              The Excel files include multiple sheets with detailed scoring information and can be opened in Microsoft Excel, Google Sheets, or any compatible spreadsheet application.
-            </p>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }
