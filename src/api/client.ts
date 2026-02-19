@@ -1,3 +1,5 @@
+// Always use relative API paths for Netlify proxy to backend
+// DO NOT use any base URL or hardcoded http://... here!
 const API_BASE_URL = '';
 
 const getToken = () => localStorage.getItem('auth_token');
