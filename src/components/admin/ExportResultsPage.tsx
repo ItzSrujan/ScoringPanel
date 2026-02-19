@@ -32,9 +32,9 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
       alert('No events available. Please create an event first.');
       return;
     }
-    
+
     const toastId = toast.loading('Exporting Round 1 scores...');
-    
+
     try {
       const mainEvent = events[0];
       const allDomains = ['fintech_ecommerce', 'health_biotech', 'agritech_rural', 'sustainable_smart_cities', 'skills_edtech'];
@@ -148,7 +148,7 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
           'Total Score Sum': item.totalSum.toFixed(2),
           'Average Score': (item.totalSum / item.count).toFixed(2)
         }));
-      
+
       if (aggregatedRows.length > 0) {
         const wsAgg = XLSX.utils.json_to_sheet(aggregatedRows);
         applyWrapAndWidths(wsAgg, [8, 14, 24, 36, 14, 14, 14]);
@@ -220,7 +220,7 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
       alert('No events available.');
       return;
     }
-    
+
     const toastId = toast.loading('Exporting Round 2 results...');
     try {
       const mainEvent = events[0];
@@ -275,7 +275,7 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
               </p>
             </div>
           </div>
-          
+
           <div className="mb-5 pl-1">
             <p className="text-xs font-semibold text-slate-700 mb-2">Includes:</p>
             <ul className="text-sm text-slate-600 space-y-1.5">
@@ -309,7 +309,7 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
               </p>
             </div>
           </div>
-          
+
           <div className="mb-5 pl-1">
             <p className="text-xs font-semibold text-slate-700 mb-2">Includes:</p>
             <ul className="text-sm text-slate-600 space-y-1.5">
@@ -350,7 +350,7 @@ export function ExportResultsPage({ events, teams, scores, judges }: ExportResul
           <div>
             <h3 className="font-semibold text-blue-900 mb-1">Export Information</h3>
             <p className="text-sm text-blue-800">
-              Exported files will be downloaded to your default downloads folder. 
+              Exported files will be downloaded to your default downloads folder.
               The Excel files include multiple sheets with detailed scoring information and can be opened in Microsoft Excel, Google Sheets, or any compatible spreadsheet application.
             </p>
           </div>
